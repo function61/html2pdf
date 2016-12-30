@@ -1,7 +1,7 @@
 What?
 -----
 
-A small Docker-based microservice that takes HTML as input and renders it as PDF.
+A small (42 MB) Docker-based microservice that takes HTML as input and renders it as PDF.
 
 
 Starting the server
