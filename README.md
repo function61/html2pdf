@@ -34,3 +34,13 @@ Alternatives
 - https://github.com/shouldbee/docker-html2pdf (go, wkhtmltox)
 - https://github.com/carlescliment/html2pdf-service (PHP, wkhtmltopdf)
 - https://github.com/spipu/html2pdf (PHP, self-implemented HTML rendering)
+
+
+Support / contact
+-----------------
+
+Basic support (no guarantees) for issues / feature requests via GitHub issues.
+
+Paid support is available via [function61.com/consulting](https://function61.com/consulting/)
+
+Contact options (email, Twitter etc.) at [function61.com](https://function61.com/)
