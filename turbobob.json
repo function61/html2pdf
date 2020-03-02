@@ -1,0 +1,34 @@
+{
+	"for_description_of_this_file_see": "https://github.com/function61/turbobob",
+	"version_major": 1,
+	"project_name": "html2pdf",
+	"builders": [
+		{
+			"name": "default",
+			"uses": "docker://fn61/buildkit-golang:20200212_0907_06f93bc3",
+			"mount_source": "",
+			"mount_destination": "/workspace",
+			"workdir": "/workspace",
+			"commands": {
+				"build": ["bin/build.sh"],
+				"dev": ["bash"]
+			}
+		},
+		{
+			"name": "publisher",
+			"uses": "docker://fn61/buildkit-publisher:20200228_1755_83c203ff",
+			"mount_destination": "/workspace",
+			"commands": {
+				"publish": ["publish-gh.sh", "function61/html2pdf", "rel/"],
+				"dev": ["bash"]
+			},
+			"pass_envs": [
+				"GITHUB_TOKEN",
+				"EVENTHORIZON"
+			]
+		}
+	],
+	"os_arches": {
+		"linux-amd64": true
+	}
+}

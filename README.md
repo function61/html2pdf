@@ -1,31 +1,49 @@
+![Build](https://github.com/function61/lambda-alertmanager/workflows/Build/badge.svg)
+
 What?
 -----
 
-A small (42 MB) Docker-based microservice that takes HTML as input and renders it as PDF.
+A small microservice that turns HTML into a PDF file. You can run this:
+
+- on AWS Lambda
+- with Docker
+  * I didn't bother making a `Dockerfile` though, since I didn't need it. PR welcome!
+- as a standalone binary
+
+There also exists [a small client library for Go]()
 
 
-Starting the server
--------------------
-
-```
-$ docker run -d --name html2pdf -p 8080:80 fn61/html2pdf
-```
-
-Testing the conversion process:
-
-```
-$ curl --form document=@example_html_input/report.html http://localhost:8080/render > report.pdf
-```
-
-
-Metrics
+Testing
 -------
 
-[Prometheus](https://prometheus.io/) metrics are available at /metrics, debug:
+You can start a local server process with:
 
+```console
+$ html2pdf server
 ```
-$ curl http://localhost:8080/metrics
+
+Then call it from the client:
+
+```console
+$ export HTML2PDF_TOKEN="doesntMatter" # optionally you can put the service behind authentication
+$ html2pdf client-localhost '<h1>hello world</h1>' > out.pdf
 ```
+
+Usage from curl is also simple:
+
+```console
+$ curl -d '{"html_base64": "PGgxPmhlbGxvIHdvcmxkPC9oMT4="}' http://localhost/render > out.pdf
+```
+
+
+Prerequisites for dev/testing
+-----------------------------
+
+```console
+$ apt install -y libxrender1 libxext6 libfontconfig1
+```
+
+(Fortunately, these exist in Lambda's AMI)
 
 
 Alternatives
