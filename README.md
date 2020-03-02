@@ -1,4 +1,4 @@
-![Build](https://github.com/function61/lambda-alertmanager/workflows/Build/badge.svg)
+![Build status](https://github.com/function61/html2pdf/workflows/Build/badge.svg)
 
 What?
 -----
