@@ -38,37 +38,6 @@ func main() {
 	exitIfError(app.Execute())
 }
 
-func client(ctx context.Context, html string, output io.Writer, baseUrl string) error {
-	h2p, err := html2pdfclient.New(baseUrl, html2pdfclient.TokenFromEnv)
-	if err != nil {
-		return err
-	}
-
-	pdf, err := h2p.Html2Pdf(ctx, html, nil)
-	if err != nil {
-		return err
-	}
-	defer pdf.Close()
-
-	_, err = io.Copy(output, pdf)
-	return err
-}
-
-func clientEntry(use string, baseUrl string) *cobra.Command {
-	return &cobra.Command{
-		Use:   use + " [html]",
-		Short: "Request HTML2PDF operation from server",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			exitIfError(client(
-				ossignal.InterruptOrTerminateBackgroundCtx(nil),
-				args[0],
-				os.Stdout,
-				baseUrl))
-		},
-	}
-}
-
 func newServerHandler() http.Handler {
 	mux := http.NewServeMux()
 
@@ -116,6 +85,37 @@ func newServerHandler() http.Handler {
 	mux.HandleFunc("/html-to-pdf", render) // backwards compat. TODO: remove later
 
 	return mux
+}
+
+func clientEntry(use string, baseUrl string) *cobra.Command {
+	return &cobra.Command{
+		Use:   use + " [html]",
+		Short: "Request HTML2PDF operation from server",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			exitIfError(client(
+				ossignal.InterruptOrTerminateBackgroundCtx(nil),
+				args[0],
+				os.Stdout,
+				baseUrl))
+		},
+	}
+}
+
+func client(ctx context.Context, html string, output io.Writer, baseUrl string) error {
+	h2p, err := html2pdfclient.New(baseUrl, html2pdfclient.TokenFromEnv)
+	if err != nil {
+		return err
+	}
+
+	pdf, err := h2p.Html2Pdf(ctx, html, nil)
+	if err != nil {
+		return err
+	}
+	defer pdf.Close()
+
+	_, err = io.Copy(output, pdf)
+	return err
 }
 
 func exitIfError(err error) {
