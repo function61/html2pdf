@@ -10,7 +10,7 @@ A small microservice that turns HTML into a PDF file. You can run this:
   * I didn't bother making a `Dockerfile` though, since I didn't need it. PR welcome!
 - as a standalone binary
 
-There also exists [a small client library for Go]()
+There also exists [a small client library for Go](pkg/html2pdfclient/)
 
 
 Testing
