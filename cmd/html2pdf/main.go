@@ -108,7 +108,7 @@ func client(ctx context.Context, html string, output io.Writer, baseUrl string) 
 		return err
 	}
 
-	pdf, err := h2p.Html2Pdf(ctx, html, nil)
+	pdf, err := h2p.Render(ctx, html, nil)
 	if err != nil {
 		return err
 	}

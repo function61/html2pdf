@@ -38,7 +38,8 @@ func New(baseUrl string, getToken TokenFn) (*Client, error) {
 	return &Client{baseUrl, bearerToken}, nil
 }
 
-func (c *Client) Html2Pdf(
+// returns PDF bytes
+func (c *Client) Render(
 	ctx context.Context,
 	html string,
 	options *h2ptypes.Options,
