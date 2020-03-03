@@ -41,7 +41,7 @@ func main() {
 func newServerHandler() http.Handler {
 	mux := http.NewServeMux()
 
-	render := func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/render", func(w http.ResponseWriter, r *http.Request) {
 		req := &h2ptypes.Request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			http.Error(w, fmt.Sprintf("Request decode: %v", err), http.StatusBadRequest)
@@ -79,10 +79,7 @@ func newServerHandler() http.Handler {
 		if _, err := io.Copy(w, pdfBuffer); err != nil {
 			log.Printf("failed to write to client: %v", err)
 		}
-	}
-
-	mux.HandleFunc("/render", render)
-	mux.HandleFunc("/html-to-pdf", render) // backwards compat. TODO: remove later
+	})
 
 	return mux
 }
