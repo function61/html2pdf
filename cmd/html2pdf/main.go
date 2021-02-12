@@ -5,18 +5,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/function61/gokit/aws/lambdautils"
-	"github.com/function61/gokit/dynversion"
-	"github.com/function61/gokit/ossignal"
-	"github.com/function61/html2pdf/pkg/h2ptypes"
-	"github.com/function61/html2pdf/pkg/html2pdfclient"
-	"github.com/spf13/cobra"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/function61/gokit/app/aws/lambdautils"
+	"github.com/function61/gokit/app/dynversion"
+	"github.com/function61/gokit/os/osutil"
+	"github.com/function61/html2pdf/pkg/h2ptypes"
+	"github.com/function61/html2pdf/pkg/html2pdfclient"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 	app.AddCommand(clientEntry("client-fn61", html2pdfclient.Function61))
 	app.AddCommand(clientEntry("client-localhost", html2pdfclient.Localhost))
 
-	exitIfError(app.Execute())
+	osutil.ExitIfError(app.Execute())
 }
 
 func newServerHandler() http.Handler {
@@ -90,8 +91,8 @@ func clientEntry(use string, baseUrl string) *cobra.Command {
 		Short: "Request HTML2PDF operation from server",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			exitIfError(client(
-				ossignal.InterruptOrTerminateBackgroundCtx(nil),
+			osutil.ExitIfError(client(
+				osutil.CancelOnInterruptOrTerminate(nil),
 				args[0],
 				os.Stdout,
 				baseUrl))
@@ -113,11 +114,4 @@ func client(ctx context.Context, html string, output io.Writer, baseUrl string) 
 
 	_, err = io.Copy(output, pdf)
 	return err
-}
-
-func exitIfError(err error) {
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
 }

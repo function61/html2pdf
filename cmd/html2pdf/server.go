@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/function61/gokit/httputils"
-	"github.com/function61/gokit/logex"
-	"github.com/function61/gokit/ossignal"
-	"github.com/function61/gokit/taskrunner"
-	"github.com/spf13/cobra"
 	"log"
 	"net/http"
+
+	"github.com/function61/gokit/log/logex"
+	"github.com/function61/gokit/net/http/httputils"
+	"github.com/function61/gokit/os/osutil"
+	"github.com/spf13/cobra"
 )
 
 func serverEntry() *cobra.Command {
@@ -19,8 +19,8 @@ func serverEntry() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := logex.StandardLogger()
 
-			exitIfError(runServer(
-				ossignal.InterruptOrTerminateBackgroundCtx(logger),
+			osutil.ExitIfError(runServer(
+				osutil.CancelOnInterruptOrTerminate(logger),
 				logger))
 		},
 	}
@@ -32,13 +32,5 @@ func runServer(ctx context.Context, logger *log.Logger) error {
 		Handler: newServerHandler(),
 	}
 
-	tasks := taskrunner.New(ctx, logger)
-
-	tasks.Start("listener "+srv.Addr, func(_ context.Context, _ string) error {
-		return httputils.RemoveGracefulServerClosedError(srv.ListenAndServe())
-	})
-
-	tasks.Start("listenershutdowner", httputils.ServerShutdownTask(srv))
-
-	return tasks.Wait()
+	return httputils.CancelableServer(ctx, srv, func() error { return srv.ListenAndServe() })
 }

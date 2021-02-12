@@ -3,10 +3,11 @@ package html2pdfclient
 import (
 	"context"
 	"fmt"
-	"github.com/function61/gokit/envvar"
-	"github.com/function61/gokit/ezhttp"
-	"github.com/function61/html2pdf/pkg/h2ptypes"
 	"io"
+
+	"github.com/function61/gokit/net/http/ezhttp"
+	"github.com/function61/gokit/os/osutil"
+	"github.com/function61/html2pdf/pkg/h2ptypes"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 type TokenFn func() (string, error)
 
 func TokenFromEnv() (string, error) {
-	return envvar.Required("HTML2PDF_TOKEN")
+	return osutil.GetenvRequired("HTML2PDF_TOKEN")
 }
 
 func NoToken() (string, error) {
