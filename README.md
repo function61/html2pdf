@@ -13,6 +13,18 @@ A small microservice that turns HTML into a PDF file. You can run this:
 There also exists [a small client library for Go](pkg/html2pdfclient/)
 
 
+Security
+--------
+
+While we're confident in this project's code, ultimately this is a wrapper to wkhtmltopdf, and thus
+you should be aware of its [status](https://wkhtmltopdf.org/status.html#recommendations) and its
+security considerations:
+
+- Do not use with untrusted HTML. Only render HTML that you control.
+- whtmltopdf uses QtWebKit that hasn’t been updated since 2012
+	* Qt abandoned QtWebkit in favor or QtWebEngine which uses Chromium internally
+
+
 Testing
 -------
 
