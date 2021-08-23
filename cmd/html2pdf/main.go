@@ -42,6 +42,19 @@ func main() {
 func newServerHandler() http.Handler {
 	mux := http.NewServeMux()
 
+	// some scripts won't print properly unless we have the right fonts. with Lambda we can't install
+	// anything outside /tmp or /task (= our .zip content extracted), so we need to hack by overriding
+	// fontconfig configuration which points to a directory where we have to ourselves explicitly
+	// list all fonts that we wish to use.
+	//
+	// we could add this env to wkhtmltopdf's ENV list, but it's easier assigning this ENV to our own
+	// process (and letting it inherit to the child).
+	//
+	// https://github.com/joonas-fi/emergency-details-printout/issues/3
+	if err := os.Setenv("FONTCONFIG_PATH", fontsPathOnLambda); err != nil {
+		panic(err) // isn't expected to fail
+	}
+
 	mux.HandleFunc("/render", func(w http.ResponseWriter, r *http.Request) {
 		req := &h2ptypes.Request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {

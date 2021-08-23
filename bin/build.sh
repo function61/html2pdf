@@ -20,15 +20,26 @@ function maybeDownloadWkhtmlToPdf {
 		| tar --strip-components=2 -xf - wkhtmltox/bin/wkhtmltopdf
 }
 
-# TODO: one deployerspec is done, we can stop overriding this from base image
+function removeTemporarySymlinksForFileRenamingInZip {
+	rm -f fonts wkhtmltopdf "${BINARY_NAME}"
+}
+
+# TODO: once deployerspec is done, we can stop overriding this from base image
 function packageLambdaFunction {
 	if [ ! -z ${FASTBUILD+x} ]; then return; fi
 
 	cd rel/
-	cp "${BINARY_NAME}_linux-amd64" "${BINARY_NAME}"
-	rm -f lambdafunc.zip
-	zip -j lambdafunc.zip "${BINARY_NAME}" "../wkhtmltopdf"
-	rm "${BINARY_NAME}"
+	removeTemporarySymlinksForFileRenamingInZip
+
+	# use symlink trick to store files as different names inside the zip
+	ln -s "${BINARY_NAME}_linux-amd64" "${BINARY_NAME}"
+	ln -s ../fonts fonts
+	ln -s ../wkhtmltopdf wkhtmltopdf
+
+	rm -f lambdafunc.zip # make sure we're not updating an existing .zip file
+	zip -r lambdafunc.zip "${BINARY_NAME}" wkhtmltopdf fonts/
+
+	removeTemporarySymlinksForFileRenamingInZip
 }
 
 maybeDownloadWkhtmlToPdf
