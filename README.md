@@ -61,6 +61,7 @@ $ apt install -y libxrender1 libxext6 libfontconfig1
 Alternatives
 ------------
 
+- https://weasyprint.org/ (Python, self-implemented rendering)
 - https://github.com/shouldbee/docker-html2pdf (go, wkhtmltox)
 - https://github.com/carlescliment/html2pdf-service (PHP, wkhtmltopdf)
 - https://github.com/spipu/html2pdf (PHP, self-implemented HTML rendering)
