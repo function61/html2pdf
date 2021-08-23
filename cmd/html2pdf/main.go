@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/function61/gokit/app/aws/lambdautils"
@@ -104,22 +105,35 @@ func clientEntry(use string, baseUrl string) *cobra.Command {
 		Short: "Request HTML2PDF operation from server",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			htmlReader := func() io.Reader {
+				if args[0] == "-" {
+					return os.Stdin
+				} else {
+					return strings.NewReader(args[0]) // HTML as argument. TODO: read from filename?
+				}
+			}()
+
 			osutil.ExitIfError(client(
 				osutil.CancelOnInterruptOrTerminate(nil),
-				args[0],
+				htmlReader,
 				os.Stdout,
 				baseUrl))
 		},
 	}
 }
 
-func client(ctx context.Context, html string, output io.Writer, baseUrl string) error {
+func client(ctx context.Context, htmlReader io.Reader, output io.Writer, baseUrl string) error {
+	html, err := io.ReadAll(htmlReader)
+	if err != nil {
+		return err
+	}
+
 	h2p, err := html2pdfclient.New(baseUrl, html2pdfclient.TokenFromEnv)
 	if err != nil {
 		return err
 	}
 
-	pdf, err := h2p.Render(ctx, html, nil)
+	pdf, err := h2p.Render(ctx, string(html), nil)
 	if err != nil {
 		return err
 	}
